@@ -39,8 +39,10 @@ class Acquisition:
     async def get_country(self, country_url, session):
         async with session.get(country_url) as response:
             data = await response.read()
-            asyncio.wait(0.1)
-        print(country_url, len(data))
+        asyncio.wait(0.5)
+        country = country_url.split('/')[-1].split('?')[0]
+        with open(f'{country}.html', 'w') as fp:
+            fp.write(str(data))
 
 
 if __name__ == "__main__":
