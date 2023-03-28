@@ -1,4 +1,7 @@
 """country_codes.py
+
+Retrieve the country information from the
+worldbank 
 """
 from bs4 import BeautifulSoup
 import aiohttp
@@ -18,6 +21,14 @@ class Acquisition:
         self.countries = {}
 
     async def acquire_main_page(self):
+        """acquire_main_page 
+
+        Parameters:
+        n/a
+
+        Returns:
+        n/a
+        """
         async with aiohttp.ClientSession() as session:
             async with session.get(self.url) as response:
                 data = await response.read()
@@ -35,6 +46,15 @@ class Acquisition:
             return await asyncio.gather(*tasks)
 
     async def get_country(self, country_url, session):
+        """get_country - retrieve the country data
+
+        Parameters:
+        country_url (str): the url pointing to the country
+        session (ClientSession): client session handed in 
+
+        Returns:
+        n/a
+        """
         async with session.get(country_url) as response:
             data = await response.read()
         asyncio.wait(0.5)
