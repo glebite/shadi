@@ -1,9 +1,10 @@
 """country_codes.py
 
 Retrieve the country information from the
-worldbank 
+worldbank site.
+
 """
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, SoupStrainer
 import aiohttp
 import asyncio
 
@@ -21,7 +22,7 @@ class Acquisition:
         self.countries = {}
 
     async def acquire_main_page(self):
-        """acquire_main_page 
+        """acquire_main_page from the site to get the country data
 
         Parameters:
         n/a
@@ -50,17 +51,20 @@ class Acquisition:
 
         Parameters:
         country_url (str): the url pointing to the country
-        session (ClientSession): client session handed in 
+        session (ClientSession): client session handed in
 
         Returns:
         n/a
         """
         async with session.get(country_url) as response:
             data = await response.read()
-        asyncio.wait(0.5)
+        asyncio.wait(5)
         country = country_url.split('/')[-1].split('?')[0]
-        with open(f'{country}.html', 'w') as fp:
-            fp.write(str(data))
+        # <a href="https://api.worldbank.org/v2/en/country/CAN?downloadformat
+        soup = BeautifulSoup(data, features='html5lib')
+        for link in soup.find_all('a', href=True):
+            if 'downloadformat=CSV' in link['href']:
+                print(country, link['href'])
 
 
 if __name__ == "__main__":
