@@ -4,7 +4,7 @@ Retrieve the country information from the
 worldbank site.
 
 """
-from bs4 import BeautifulSoup, SoupStrainer
+from bs4 import BeautifulSoup
 import aiohttp
 import asyncio
 
