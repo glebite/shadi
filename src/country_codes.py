@@ -63,6 +63,7 @@ class Acquisition:
         # <a href="https://api.worldbank.org/v2/en/country/CAN?downloadformat
         soup = BeautifulSoup(data, features='html5lib')
         for link in soup.find_all('a', href=True):
+            print(link)
             if 'downloadformat=CSV' in link['href']:
                 print(country, link['href'])
 
