@@ -60,15 +60,13 @@ class Acquisition:
         async with session.get(country_url) as response:
             data = await response.read()
             time.sleep(0.1)
-        asyncio.wait(5)
-        country = country_url.split('/')[-1].split('?')[0]
-        print(f'Getting {country=}')
-        # <a href="https://api.worldbank.org/v2/en/country/CAN?downloadformat
-        soup = BeautifulSoup(data, features='html5lib')
-        # for link in soup.find_all('a', href=True):
-        #    print(link)
-        #    if 'downloadformat=CSV' in link['href']:
-        #        print(country, link['href'])
+            country = country_url.split('/')[-1].split('?')[0]
+            print(f'Getting {country=}')
+            soup = BeautifulSoup(str(data), features='html5lib')
+            for link in soup.find_all('a', href=True):
+                if 'downloadformat=CSV' in link['href']:
+                    print(country, link['href'])
+            asyncio.wait(5)
 
 
 if __name__ == "__main__":
