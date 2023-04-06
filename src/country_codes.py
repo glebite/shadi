@@ -59,14 +59,13 @@ class Acquisition:
         """
         async with session.get(country_url) as response:
             data = await response.read()
-            time.sleep(0.1)
             country = country_url.split('/')[-1].split('?')[0]
             print(f'Getting {country=}')
             soup = BeautifulSoup(str(data), features='html5lib')
             for link in soup.find_all('a', href=True):
                 if 'downloadformat=CSV' in link['href']:
                     print(country, link['href'])
-            asyncio.wait(5)
+        await asyncio.sleep(0)
 
 
 if __name__ == "__main__":
