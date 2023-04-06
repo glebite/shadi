@@ -65,7 +65,7 @@ class Acquisition:
             for link in soup.find_all('a', href=True):
                 if 'downloadformat=CSV' in link['href']:
                     print(country, link['href'])
-        await asyncio.sleep(0)
+        await asyncio.sleep(0.001)
 
 
 if __name__ == "__main__":
