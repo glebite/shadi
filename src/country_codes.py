@@ -4,7 +4,6 @@ Retrieve the country information from the
 worldbank site.
 
 """
-import time
 from bs4 import BeautifulSoup
 import aiohttp
 import asyncio
@@ -31,7 +30,7 @@ class Acquisition:
         Returns:
         n/a
         """
-        connector = aiohttp.TCPConnector(limit=10)
+        connector = aiohttp.TCPConnector(force_close=True, limit=1)
         async with aiohttp.ClientSession(connector=connector) as session:
             async with session.get(self.url) as response:
                 data = await response.read()
@@ -63,7 +62,7 @@ class Acquisition:
             asyncio.sleep(0.001)
             country = country_url.split('/')[-1].split('?')[0]
             print(f'Getting {country=}')
-            soup = BeautifulSoup(str(data), features='html5lib')
+            soup = BeautifulSoup(data, features='html5lib')
             for link in soup.find_all('a', href=True):
                 if 'downloadformat=CSV' in link['href']:
                     print(country, link['href'])
