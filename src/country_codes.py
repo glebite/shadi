@@ -30,8 +30,8 @@ class Acquisition:
         Returns:
         n/a
         """
-        connector = aiohttp.TCPConnector(force_close=True, limit=1)
-        async with aiohttp.ClientSession(connector=connector) as session:
+        # connector = aiohttp.TCPConnector(force_close=True, limit=1)
+        async with aiohttp.ClientSession() as session:
             async with session.get(self.url) as response:
                 data = await response.read()
                 await asyncio.sleep(0.5)
