@@ -34,7 +34,6 @@ class Acquisition:
         async with aiohttp.ClientSession() as session:
             async with session.get(self.url) as response:
                 data = await response.read()
-                print(f'{data[0:128]} {len(data)}')
                 await asyncio.sleep(0.5)
 
             soup = BeautifulSoup(data, 'html.parser')
@@ -44,7 +43,6 @@ class Acquisition:
             for link in soup.find_all('a'):
                 if not link['href'].endswith('country') and \
                    'country' in link['href']:
-                    print(f"Country found: {link['href']}")
                     urls.append("https://data.worldbank.org" + link['href'])
 
             tasks = [self.get_country(url, session) for url in urls]
@@ -64,12 +62,15 @@ class Acquisition:
             data = await response.read()
             await asyncio.sleep(0.001)
             country = country_url.split('/')[-1].split('?')[0]
-            print(f'Getting {country=}')
-            soup = BeautifulSoup(data, 'html.parser', parse_only=SoupStrainer('a'))
+            soup = BeautifulSoup(data, 'html.parser',
+                                 parse_only=SoupStrainer('a'))
             for link in soup:
                 if link.has_attr('href'):
                     if 'downloadformat=csv' in link.get('href'):
-                        print(country, link['href'])
+                        async with session.get(link['href']) as retrieval:
+                            data = await retrieval.read()
+                            with open(f'{country}.zip', 'wb') as fp:
+                                fp.write(data)
 
 
 if __name__ == "__main__":
