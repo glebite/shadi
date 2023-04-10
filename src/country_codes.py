@@ -4,7 +4,7 @@ Retrieve the country information from the
 worldbank site.
 
 """
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, SoupStrainer
 import aiohttp
 import asyncio
 
@@ -34,14 +34,17 @@ class Acquisition:
         async with aiohttp.ClientSession() as session:
             async with session.get(self.url) as response:
                 data = await response.read()
+                print(f'{data[0:128]} {len(data)}')
                 await asyncio.sleep(0.5)
 
             soup = BeautifulSoup(data, 'html.parser')
 
+            print('Processing links...')
             urls = []
             for link in soup.find_all('a'):
                 if not link['href'].endswith('country') and \
                    'country' in link['href']:
+                    print(f"Country found: {link['href']}")
                     urls.append("https://data.worldbank.org" + link['href'])
 
             tasks = [self.get_country(url, session) for url in urls]
@@ -59,13 +62,14 @@ class Acquisition:
         """
         async with session.get(country_url) as response:
             data = await response.read()
-            asyncio.sleep(0.001)
+            await asyncio.sleep(0.001)
             country = country_url.split('/')[-1].split('?')[0]
             print(f'Getting {country=}')
-            soup = BeautifulSoup(data, features='html5lib')
-            for link in soup.find_all('a', href=True):
-                if 'downloadformat=CSV' in link['href']:
-                    print(country, link['href'])
+            soup = BeautifulSoup(data, 'html.parser', parse_only=SoupStrainer('a'))
+            for link in soup:
+                if link.has_attr('href'):
+                    if 'downloadformat=csv' in link.get('href'):
+                        print(country, link['href'])
 
 
 if __name__ == "__main__":
