@@ -4,6 +4,8 @@ Retrieve the country information from the
 worldbank site.
 
 """
+import logging
+import argparse
 from bs4 import BeautifulSoup, SoupStrainer
 import aiohttp
 import asyncio
@@ -30,10 +32,12 @@ class Acquisition:
         Returns:
         n/a
         """
-        # connector = aiohttp.TCPConnector(force_close=True, limit=1)
         async with aiohttp.ClientSession() as session:
             async with session.get(self.url) as response:
-                data = await response.read()
+                try:
+                    data = await response.read()
+                except Exception as e:
+                    logging.error(f'{e=}')
                 await asyncio.sleep(0.5)
 
             soup = BeautifulSoup(data, 'html.parser')
@@ -73,6 +77,17 @@ class Acquisition:
                                 fp.write(data)
 
 
+def main():
+    parser = argparse.ArgumentParser(
+        prog='country_codes',
+        description='What the program does',
+        epilog='Text at the bottom of help')
+    parser.add_argument('-d', '--datadir')
+    parser.add_argument('-v', '--verbose',
+                        action='store_true')
+    args = parser.parse_args()
+    print(args)
+
+
 if __name__ == "__main__":
-    x = Acquisition(URL)
-    asyncio.run(x.acquire_main_page())
+    main()
