@@ -42,7 +42,6 @@ class Acquisition:
 
             soup = BeautifulSoup(data, 'html.parser')
 
-            print('Processing links...')
             urls = []
             for link in soup.find_all('a'):
                 if not link['href'].endswith('country') and \
