@@ -17,11 +17,12 @@ URL = "https://data.worldbank.org/country"
 class Acquisition:
     """Acquisition
     """
-    def __init__(self, url):
+    def __init__(self, url, data_path):
         """
         """
         self.url = url
         self.countries = {}
+        self.data_path = None
 
     async def acquire_main_page(self):
         """acquire_main_page from the site to get the country data
@@ -72,6 +73,7 @@ class Acquisition:
                     if 'downloadformat=csv' in link.get('href'):
                         async with session.get(link['href']) as retrieval:
                             data = await retrieval.read()
+                            print(f'Writing datapath = {self.data_path}')
                             with open(f'{country}.zip', 'wb') as fp:
                                 fp.write(data)
 
@@ -85,7 +87,9 @@ def main():
     parser.add_argument('-v', '--verbose',
                         action='store_true')
     args = parser.parse_args()
-    print(args)
+    data_path = args.datadir
+    obj = Acquisition(URL, data_path)
+    obj.acquire_main_page()
 
 
 if __name__ == "__main__":
