@@ -4,6 +4,7 @@ Retrieve the country information from the
 worldbank site.
 
 """
+import os
 import logging
 import argparse
 from bs4 import BeautifulSoup, SoupStrainer
@@ -22,7 +23,9 @@ class Acquisition:
         """
         self.url = url
         self.countries = {}
-        self.data_path = None
+        self.data_path = data_path
+        if not os.path.exists(data_path):
+            os.mkdir(data_path)
 
     async def acquire_main_page(self):
         """acquire_main_page from the site to get the country data
@@ -50,7 +53,8 @@ class Acquisition:
                     urls.append("https://data.worldbank.org" + link['href'])
 
             tasks = [self.get_country(url, session) for url in urls]
-            return await asyncio.gather(*tasks)
+            await asyncio.gather(*tasks)
+            return
 
     async def get_country(self, country_url, session):
         """get_country - retrieve the country data
@@ -73,8 +77,7 @@ class Acquisition:
                     if 'downloadformat=csv' in link.get('href'):
                         async with session.get(link['href']) as retrieval:
                             data = await retrieval.read()
-                            print(f'Writing datapath = {self.data_path}')
-                            with open(f'{country}.zip', 'wb') as fp:
+                            with open(f'{self.data_path}/{country}.zip', 'wb') as fp:
                                 fp.write(data)
 
 
@@ -89,7 +92,7 @@ def main():
     args = parser.parse_args()
     data_path = args.datadir
     obj = Acquisition(URL, data_path)
-    obj.acquire_main_page()
+    asyncio.run(obj.acquire_main_page())
 
 
 if __name__ == "__main__":
