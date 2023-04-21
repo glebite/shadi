@@ -17,11 +17,13 @@ class unzip_processing:
     def extract_from_zip(self):
         """extract_from_zip - extract zip files
         """
+        logging.debug('extraction')
         pass
 
     def pull_all_data(self):
         """pull_all_data - from loose files
         """
+        logging.debug('pull_all_data')
         pass
 
 
